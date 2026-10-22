@@ -23,87 +23,136 @@ const jsonLd = {
     </header>
 
     <div class="card" style="padding:40px 32px">
-      <h1 style="font-size:clamp(28px,6vw,42px)">
+      <h1 style="font-size:clamp(26px,6vw,38px)">
         Seu site, analisado <span style="color:var(--orange)">ao vivo</span>
       </h1>
-      <p class="muted" style="font-size:17px;margin-bottom:8px">
-        Toda terça, às <strong style="color:var(--txt)">22h</strong>, eu abro o Zoom e analiso
-        sites de verdade — SEO, velocidade, conversão. E é <strong style="color:var(--txt)">grátis</strong>.
-      </p>
-      <p class="muted" style="font-size:15px;margin-bottom:24px">
-        Entre na lista e receba o link da aula + o grupo do seu público no WhatsApp.
+      <p class="muted" style="font-size:16px;margin-bottom:24px">
+        Toda terça, às <strong style="color:var(--txt)">22h</strong>, no Zoom. Grátis.
+        Leva 30 segundos — 4 passinhos:
       </p>
 
-      <form id="form-analise" novalidate>
-        <div class="field">
-          <label for="nome">Nome</label>
-          <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Seu nome" required maxlength="120" />
-        </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" required />
-        </div>
-        <div class="field">
-          <label for="whatsapp">WhatsApp (com DDD)</label>
-          <input id="whatsapp" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" required />
-        </div>
+      <!-- progresso -->
+      <div class="progresso" aria-hidden="true">
+        <span class="ponto ativa" data-dot="1"></span>
+        <span class="ponto" data-dot="2"></span>
+        <span class="ponto" data-dot="3"></span>
+        <span class="ponto" data-dot="4"></span>
+      </div>
+      <p class="mono passo-label" id="passo-label" aria-live="polite">Passo 01 — seu nome</p>
 
-        <fieldset class="field" id="bloco-segmento">
-          <legend>Qual é o seu público?</legend>
-          <p class="muted small" style="margin:2px 0 10px">Escolha uma opção — é assim que você entra no grupo certo.</p>
-          <div class="radios">
-            <label class="radio" for="seg-agencia">
-              <input type="radio" id="seg-agencia" name="segmento" value="agencia" />
-              <span>🏢 Agência</span>
-            </label>
-            <label class="radio" for="seg-dono">
-              <input type="radio" id="seg-dono" name="segmento" value="dono_de_negocio" />
-              <span>💼 Dono de negócio</span>
-            </label>
-            <label class="radio" for="seg-freela">
-              <input type="radio" id="seg-freela" name="segmento" value="freelancer" />
-              <span>🧑‍💻 Freelancer</span>
-            </label>
-          </div>
-        </fieldset>
+      <!-- STEP 1 · nome -->
+      <div class="step" data-step="1">
+        <label class="pergunta" for="nome">Como posso te chamar?</label>
+        <input id="nome" type="text" autocomplete="name" placeholder="Seu nome" maxlength="120" />
+      </div>
 
-        <p id="form-error" class="error" role="alert" aria-live="polite" hidden></p>
+      <!-- STEP 2 · email -->
+      <div class="step" data-step="2" hidden>
+        <label class="pergunta" for="email">Qual email você mais usa?</label>
+        <p class="muted small">É pra lá que vai o link da aula semanal.</p>
+        <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" />
+      </div>
 
-        <button type="submit" class="btn" id="btn-cadastro" style="width:100%">
-          Quero minha análise gratuita →
-        </button>
-        <p class="muted small" style="margin-top:12px;text-align:center">
-          Sem spam. Só o link da aula e o seu grupo no WhatsApp.
-        </p>
-      </form>
+      <!-- STEP 3 · whatsapp -->
+      <div class="step" data-step="3" hidden>
+        <label class="pergunta" for="whatsapp">WhatsApp com DDD?</label>
+        <p class="muted small">Só pra te chamar pro grupo certo no dia da aula.</p>
+        <input id="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" />
+      </div>
+
+      <!-- STEP 4 · segmento -->
+      <div class="step" data-step="4" hidden>
+        <label class="pergunta">Qual é o seu público?</label>
+        <p class="muted small">Escolhe um — é assim que você cai no grupo certo.</p>
+        <div class="radios" role="radiogroup" aria-label="Seu público">
+          <label class="radio" for="seg-agencia">
+            <input type="radio" id="seg-agencia" name="segmento" value="agencia" />
+            <span>🏢 Agência</span>
+          </label>
+          <label class="radio" for="seg-dono">
+            <input type="radio" id="seg-dono" name="segmento" value="dono_de_negocio" />
+            <span>💼 Dono de negócio</span>
+          </label>
+          <label class="radio" for="seg-freela">
+            <input type="radio" id="seg-freela" name="segmento" value="freelancer" />
+            <span>🧑‍💻 Freelancer</span>
+          </label>
+        </div>
+      </div>
+
+      <p id="form-error" class="error" role="alert" aria-live="polite" hidden></p>
+
+      <!-- controles -->
+      <div class="nav-passos">
+        <button type="button" id="btn-voltar" class="btn-voltar" hidden>← Voltar</button>
+        <button type="button" id="btn-ir" class="btn" style="min-width:180px">Continuar →</button>
+      </div>
+      <p class="muted small" style="margin-top:16px;text-align:center">
+        Sem spam. Só o link da aula e o seu grupo no WhatsApp.
+      </p>
     </div>
   </div>
 </BaseLayout>
 
 <style>
-  .field {
-    margin-bottom: 16px;
+  .progresso {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
   }
-  fieldset.field {
-    border: 0;
-    padding: 0;
+  .ponto {
+    flex: 1;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.08);
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+  .ponto.ativa,
+  .ponto.feita {
+    background: var(--orange);
+  }
+  .ponto.feita {
+    opacity: 0.55;
+  }
+  .passo-label {
+    color: var(--gray);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     margin: 0 0 16px;
   }
-  fieldset.field legend {
+  .step {
+    min-height: 150px;
+  }
+  .pergunta {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
     font-weight: 600;
     color: var(--txt);
-    padding: 0;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .step input {
+    width: 100%;
+    margin-top: 14px;
+    font-size: 17px;
+    padding: 14px 16px;
+  }
+  .small {
+    font-size: 13px;
   }
   .radios {
     display: grid;
     gap: 8px;
+    margin-top: 14px;
   }
   .radio {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 10px;
     background: var(--bg3);
@@ -125,77 +174,177 @@ const jsonLd = {
     outline: 2px solid var(--orange-light);
     outline-offset: 2px;
   }
-  .small {
-    font-size: 13px;
+  .nav-passos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .btn-voltar {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--gray);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .btn-voltar:hover {
+    color: var(--txt);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .btn-voltar:focus-visible {
+    outline: 2px solid var(--orange-light);
+    outline-offset: 2px;
   }
 </style>
 
 <script>
-  const form = document.getElementById('form-analise') as HTMLFormElement;
+  const LABELS: Record<number, string> = {
+    1: 'Passo 01 — seu nome',
+    2: 'Passo 02 — seu email',
+    3: 'Passo 03 — seu WhatsApp',
+    4: 'Passo 04 — seu público',
+  };
+
+  let passoAtual = 1;
+  let enviando = false;
+
+  const steps = Array.from(document.querySelectorAll<HTMLElement>('.step'));
+  const dots = Array.from(document.querySelectorAll<HTMLElement>('.ponto'));
+  const labelEl = document.getElementById('passo-label') as HTMLElement;
   const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
-  const btn = document.getElementById('btn-cadastro') as HTMLButtonElement;
-  const whatsappInput = form.whatsapp as HTMLInputElement;
+  const btnIr = document.getElementById('btn-ir') as HTMLButtonElement;
+  const btnVoltar = document.getElementById('btn-voltar') as HTMLButtonElement;
+  const nome = document.getElementById('nome') as HTMLInputElement;
+  const email = document.getElementById('email') as HTMLInputElement;
+  const whatsapp = document.getElementById('whatsapp') as HTMLInputElement;
 
   function mostrarErro(msg: string) {
     errorEl.textContent = msg;
     errorEl.hidden = false;
-    form.setAttribute('aria-invalid', 'true');
   }
   function limparErro() {
     errorEl.hidden = true;
     errorEl.textContent = '';
-    form.removeAttribute('aria-invalid');
   }
 
-  // máscara leve: só dígitos, (DD) XXXXX-XXXX
-  whatsappInput.addEventListener('input', () => {
-    const d = whatsappInput.value.replace(/\D/g, '').slice(0, 11);
-    if (d.length <= 2) whatsappInput.value = d;
-    else if (d.length <= 7) whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    else if (d.length <= 10) whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    else whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  function irPara(passo: number) {
+    passoAtual = passo;
+    limparErro();
+    for (const s of steps) s.hidden = Number(s.dataset.step) !== passo;
+    for (const d of dots) {
+      const n = Number(d.dataset.dot);
+      d.classList.toggle('ativa', n === passo);
+      d.classList.toggle('feita', n < passo);
+    }
+    labelEl.textContent = LABELS[passo];
+    btnVoltar.hidden = passo === 1;
+    btnIr.textContent = passo === 4 ? 'Quero minha análise gratuita →' : 'Continuar →';
+    const alvo = steps.find((s) => Number(s.dataset.step) === passo)?.querySelector('input') as
+      | HTMLInputElement
+      | null;
+    alvo?.focus();
+  }
+
+  // máscara WhatsApp: (DD) XXXXX-XXXX — qualquer DDD
+  whatsapp.addEventListener('input', () => {
+    const d = whatsapp.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) whatsapp.value = d;
+    else if (d.length <= 7) whatsapp.value = `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    else if (d.length <= 10)
+      whatsapp.value = `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    else whatsapp.value = `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
   });
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  function validarPasso(): boolean {
+    if (passoAtual === 1) {
+      if (!nome.value.trim()) return mostrarErro('Digite seu nome pra continuar.'), false;
+    }
+    if (passoAtual === 2) {
+      const v = email.value.trim();
+      if (!v) return mostrarErro('Digite seu email.'), false;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))
+        return mostrarErro('Esse email parece incompleto — confere aí.'), false;
+    }
+    if (passoAtual === 3) {
+      if (whatsapp.value.replace(/\D/g, '').length < 10)
+        return mostrarErro('WhatsApp incompleto — precisa do DDD + número.'), false;
+    }
+    if (passoAtual === 4) {
+      if (!document.querySelector('input[name="segmento"]:checked'))
+        return mostrarErro('Escolhe uma opção: Agência, Dono de Negócio ou Freelancer.'), false;
+    }
     limparErro();
+    return true;
+  }
 
-    const nome = (form.nome as HTMLInputElement).value.trim();
-    const email = (form.email as HTMLInputElement).value.trim();
-    const whatsapp = (form.whatsapp as HTMLInputElement).value.trim();
-    const segmentoEl = form.querySelector('input[name="segmento"]:checked') as HTMLInputElement | null;
+  async function enviar() {
+    if (enviando) return;
+    enviando = true;
+    btnIr.disabled = true;
+    btnIr.setAttribute('aria-busy', 'true');
+    btnIr.textContent = 'Separando seu grupo…';
 
-    if (!nome) return mostrarErro('Informe seu nome.');
-    if (!email) return mostrarErro('Informe seu email.');
-    if (whatsapp.replace(/\D/g, '').length < 10) return mostrarErro('WhatsApp incompleto — informe DDD + número.');
-    if (!segmentoEl) return mostrarErro('Escolha uma opção: Agência, Dono de Negócio ou Freelancer.');
-
-    btn.disabled = true;
-    btn.setAttribute('aria-busy', 'true');
-    btn.textContent = 'Enquanto você lê isso, eu separo seu grupo…';
+    const segmentoEl = document.querySelector<HTMLInputElement>('input[name="segmento"]:checked');
 
     try {
       const res = await fetch('/api/cadastro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, whatsapp, segmento: segmentoEl.value }),
+        body: JSON.stringify({
+          nome: nome.value.trim(),
+          email: email.value.trim(),
+          whatsapp: whatsapp.value.trim(),
+          segmento: segmentoEl?.value,
+        }),
       });
       const json = (await res.json()) as { ok: boolean; erro?: string };
 
       if (!res.ok || !json.ok) {
-        mostrarErro(json.erro ?? 'Não foi possível concluir o cadastro. Tente novamente.');
-        btn.disabled = false;
-        btn.removeAttribute('aria-busy');
-        btn.textContent = 'Quero minha análise gratuita →';
+        mostrarErro(json.erro ?? 'Não foi possível concluir. Tente novamente.');
+        btnIr.disabled = false;
+        btnIr.removeAttribute('aria-busy');
+        btnIr.textContent = 'Quero minha análise gratuita →';
+        enviando = false;
         return;
       }
 
-      window.location.href = `/obrigado?seg=${encodeURIComponent(segmentoEl.value)}`;
+      window.location.href = `/obrigado?seg=${encodeURIComponent(segmentoEl?.value ?? '')}`;
     } catch {
       mostrarErro('Erro de conexão. Tente novamente.');
-      btn.disabled = false;
-      btn.removeAttribute('aria-busy');
-      btn.textContent = 'Quero minha análise gratuita →';
+      btnIr.disabled = false;
+      btnIr.removeAttribute('aria-busy');
+      btnIr.textContent = 'Quero minha análise gratuita →';
+      enviando = false;
     }
+  }
+
+  btnIr.addEventListener('click', () => {
+    if (!validarPasso()) return;
+    if (passoAtual < 4) irPara(passoAtual + 1);
+    else enviar();
   });
+
+  btnVoltar.addEventListener('click', () => {
+    if (passoAtual > 1) irPara(passoAtual - 1);
+  });
+
+  // Enter avança no passo atual (exceto no 4 — lá o botão faz o envio)
+  for (const input of [nome, email, whatsapp]) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (passoAtual < 4 && validarPasso()) irPara(passoAtual + 1);
+      }
+    });
+  }
+
+  // no passo 4, selecionar o radio já habilita o envio visualmente (limpa erro)
+  for (const radio of Array.from(document.querySelectorAll<HTMLInputElement>('input[name="segmento"]'))) {
+    radio.addEventListener('change', limparErro);
+  }
 </script>
