@@ -1,0 +1,19 @@
+# dependências
+node_modules/
+
+# build
+dist/
+.wrangler/
+
+# segredos — NUNCA commitar
+.env
+.env.local
+.env.production
+
+# sistema
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*

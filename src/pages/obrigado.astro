@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSettings, grupoDoSegmento, ehSegmento, SEGMENTOS } from '../lib/settings';
+
+const segParam = Astro.url.searchParams.get('seg');
+if (!ehSegmento(segParam)) {
+  return Astro.redirect('/?erro=segmento');
+}
+const segmento = segParam; // ehSegmento garante o tipo aqui
+
+const settings = await getSettings();
+const seg = SEGMENTOS[segmento];
+const linkGrupo = grupoDoSegmento(settings, segmento);
+const linkAula = settings.link_aula;
+const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
+---
+
+<BaseLayout
+  title="Cadastro confirmado — sua análise está a caminho | Bruno Medeiros"
+  description="Você entrou na lista da análise gratuita ao vivo. Confira seu grupo e o link da aula."
+  noindex
+>
+  <div class="container" style="padding-block:48px 64px;max-width:560px">
+    <div class="card" style="padding:40px 32px;text-align:center">
+      <p class="mono" style="color:var(--orange);font-size:13px;margin:0 0 8px">// confirmado</p>
+      <h1 style="font-size:clamp(26px,6vw,38px)">
+        Tá dentro! <span style="color:var(--orange)">🎯</span>
+      </h1>
+      <p class="muted" style="font-size:16px">
+        Seu email de boas-vindas já está a caminho com tudo isso aqui:
+      </p>
+
+      <div class="bloco" style="text-align:left">
+        <p class="rotulo mono">1 · Seu grupo ({seg.emoji} {seg.label})</p>
+        {grupoReal ? (
+          <a href={linkGrupo} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
+            Entrar no grupo no WhatsApp →
+          </a>
+        ) : (
+          <p class="muted small" style="margin:0">O link do seu grupo aparece aqui assim que for publicado.</p>
+        )}
+      </div>
+
+      <div class="bloco" style="text-align:left">
+        <p class="rotulo mono">2 · A aula ao vivo</p>
+        <p class="muted small" style="margin:0 0 10px">
+          Toda <strong style="color:var(--txt)">terça, 22h</strong>, no Zoom. Análise de sites reais, ao vivo, grátis.
+        </p>
+        <a href={linkAula} target="_blank" rel="noopener" class="btn btn-ghost" style="text-decoration:none;display:block">
+          Link da aula (chega por email também) →
+        </a>
+      </div>
+
+      <p class="muted small" style="margin-top:24px">
+        Te vejo terça. Traz teu site que eu analiso ao vivo. 👊
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .bloco {
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    background: var(--bg3);
+  }
+  .rotulo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--orange);
+    margin: 0 0 10px;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--txt);
+  }
+  .small {
+    font-size: 13px;
+  }
+</style>

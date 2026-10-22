@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Análise Gratuita de Site ao Vivo',
+  description:
+    'Inscreva-se para ter seu site analisado ao vivo no Zoom, toda terça às 22h, por Bruno Medeiros. Grátis.',
+  provider: { '@type': 'Person', name: 'Bruno Medeiros' },
+};
+---
+
+<BaseLayout
+  title="Análise Gratuita de Site ao Vivo | Bruno Medeiros"
+  description="Cadastre-se e tenha seu site analisado AO VIVO no Zoom, toda terça às 22h. Grátis, com grupos separados por público: agência, dono de negócio e freelancer."
+  canonical="https://links.brunomedeiroseo.com.br/analise"
+  jsonLd={jsonLd}
+>
+  <div class="container" style="padding-block:48px 64px;max-width:560px">
+    <header class="mono" style="color:var(--gray);font-size:13px;margin-bottom:24px">
+      // Análises ao vivo
+    </header>
+
+    <div class="card" style="padding:40px 32px">
+      <h1 style="font-size:clamp(28px,6vw,42px)">
+        Seu site, analisado <span style="color:var(--orange)">ao vivo</span>
+      </h1>
+      <p class="muted" style="font-size:17px;margin-bottom:8px">
+        Toda terça, às <strong style="color:var(--txt)">22h</strong>, eu abro o Zoom e analiso
+        sites de verdade — SEO, velocidade, conversão. E é <strong style="color:var(--txt)">grátis</strong>.
+      </p>
+      <p class="muted" style="font-size:15px;margin-bottom:24px">
+        Entre na lista e receba o link da aula + o grupo do seu público no WhatsApp.
+      </p>
+
+      <form id="form-analise" novalidate>
+        <div class="field">
+          <label for="nome">Nome</label>
+          <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Seu nome" required maxlength="120" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" required />
+        </div>
+        <div class="field">
+          <label for="whatsapp">WhatsApp (com DDD)</label>
+          <input id="whatsapp" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" required />
+        </div>
+
+        <fieldset class="field" id="bloco-segmento">
+          <legend>Qual é o seu público?</legend>
+          <p class="muted small" style="margin:2px 0 10px">Escolha uma opção — é assim que você entra no grupo certo.</p>
+          <div class="radios">
+            <label class="radio" for="seg-agencia">
+              <input type="radio" id="seg-agencia" name="segmento" value="agencia" />
+              <span>🏢 Agência</span>
+            </label>
+            <label class="radio" for="seg-dono">
+              <input type="radio" id="seg-dono" name="segmento" value="dono_de_negocio" />
+              <span>💼 Dono de negócio</span>
+            </label>
+            <label class="radio" for="seg-freela">
+              <input type="radio" id="seg-freela" name="segmento" value="freelancer" />
+              <span>🧑‍💻 Freelancer</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <p id="form-error" class="error" role="alert" aria-live="polite" hidden></p>
+
+        <button type="submit" class="btn" id="btn-cadastro" style="width:100%">
+          Quero minha análise gratuita →
+        </button>
+        <p class="muted small" style="margin-top:12px;text-align:center">
+          Sem spam. Só o link da aula e o seu grupo no WhatsApp.
+        </p>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .field {
+    margin-bottom: 16px;
+  }
+  fieldset.field {
+    border: 0;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+  fieldset.field legend {
+    font-weight: 600;
+    color: var(--txt);
+    padding: 0;
+    margin-bottom: 4px;
+  }
+  .radios {
+    display: grid;
+    gap: 8px;
+  }
+  .radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    background: var(--bg3);
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
+  }
+  .radio:has(input:checked) {
+    border-color: var(--orange);
+    background: rgba(232, 116, 59, 0.08);
+  }
+  .radio input {
+    accent-color: var(--orange);
+    width: 18px;
+    height: 18px;
+  }
+  .radio:focus-within {
+    outline: 2px solid var(--orange-light);
+    outline-offset: 2px;
+  }
+  .small {
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('form-analise') as HTMLFormElement;
+  const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
+  const btn = document.getElementById('btn-cadastro') as HTMLButtonElement;
+  const whatsappInput = form.whatsapp as HTMLInputElement;
+
+  function mostrarErro(msg: string) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+    form.setAttribute('aria-invalid', 'true');
+  }
+  function limparErro() {
+    errorEl.hidden = true;
+    errorEl.textContent = '';
+    form.removeAttribute('aria-invalid');
+  }
+
+  // máscara leve: só dígitos, (DD) XXXXX-XXXX
+  whatsappInput.addEventListener('input', () => {
+    const d = whatsappInput.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) whatsappInput.value = d;
+    else if (d.length <= 7) whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    else if (d.length <= 10) whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    else whatsappInput.value = `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    limparErro();
+
+    const nome = (form.nome as HTMLInputElement).value.trim();
+    const email = (form.email as HTMLInputElement).value.trim();
+    const whatsapp = (form.whatsapp as HTMLInputElement).value.trim();
+    const segmentoEl = form.querySelector('input[name="segmento"]:checked') as HTMLInputElement | null;
+
+    if (!nome) return mostrarErro('Informe seu nome.');
+    if (!email) return mostrarErro('Informe seu email.');
+    if (whatsapp.replace(/\D/g, '').length < 10) return mostrarErro('WhatsApp incompleto — informe DDD + número.');
+    if (!segmentoEl) return mostrarErro('Escolha uma opção: Agência, Dono de Negócio ou Freelancer.');
+
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    btn.textContent = 'Enquanto você lê isso, eu separo seu grupo…';
+
+    try {
+      const res = await fetch('/api/cadastro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, whatsapp, segmento: segmentoEl.value }),
+      });
+      const json = (await res.json()) as { ok: boolean; erro?: string };
+
+      if (!res.ok || !json.ok) {
+        mostrarErro(json.erro ?? 'Não foi possível concluir o cadastro. Tente novamente.');
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Quero minha análise gratuita →';
+        return;
+      }
+
+      window.location.href = `/obrigado?seg=${encodeURIComponent(segmentoEl.value)}`;
+    } catch {
+      mostrarErro('Erro de conexão. Tente novamente.');
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+      btn.textContent = 'Quero minha análise gratuita →';
+    }
+  });
+</script>

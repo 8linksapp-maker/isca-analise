@@ -1,0 +1,30 @@
+---
+import '../styles/fonts.css';
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <Seo {...props} />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <main id="conteudo">
+      <slot />
+    </main>
+  </body>
+</html>
