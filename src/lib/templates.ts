@@ -2,7 +2,6 @@
  * Templates de email da Isca Análise — design dark do app
  * bg #0a0a0a · card #141414 · accent laranja #E8743B
  */
-import { SEGMENTOS, type Segmento } from './settings';
 
 function escapeHtml(s: string): string {
   return s
@@ -83,23 +82,21 @@ function baseHtml(params: {
 </html>`;
 }
 
-/** Email de boas-vindas: link da aula + grupo do segmento. */
+/** Email de boas-vindas: link da aula + grupo (sem expor segmentação ao lead). */
 export function templateBoasVindasAnalise(params: {
   nome: string;
-  segmento: Segmento;
   linkAula: string;
   linkGrupo: string;
 }): string {
   const primeiroNome = params.nome.trim().split(/\s+/)[0];
-  const seg = SEGMENTOS[params.segmento];
   return baseHtml({
     title: 'Bem-vindo — sua Análise Gratuita',
     label: 'Análise gratuita ao vivo',
     heading: `Tudo certo, <span style="color:#e8743b;">${escapeHtml(primeiroNome)}</span> 🎯`,
-    paragrafo: `Sua inscrição para a <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada. Seu público é <strong style="color:#f0f0f0;">${seg.emoji} ${seg.label}</strong>.<br><br>A aula acontece <strong style="color:#f0f0f0;">toda terça, às 22h</strong>, ao vivo no Zoom. Entre no seu grupo do WhatsApp para receber os avisos e marcar sua análise:`,
+    paragrafo: `Sua inscrição para a <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada.<br><br>A aula acontece <strong style="color:#f0f0f0;">toda terça, às 22h</strong>, ao vivo no Zoom. Entra no grupo do WhatsApp que separei pra você pra receber os avisos e marcar sua análise:`,
     botoes: [
       { texto: 'Assistir à aula (toda terça, 22h)', url: params.linkAula, destaque: true },
-      { texto: `Entrar no grupo ${seg.label}`, url: params.linkGrupo },
+      { texto: 'Entrar no grupo no WhatsApp', url: params.linkGrupo },
     ],
   });
 }

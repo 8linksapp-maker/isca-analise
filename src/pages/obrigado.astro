@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getSettings, grupoDoSegmento, ehSegmento, SEGMENTOS } from '../lib/settings';
+import { getSettings, grupoDoSegmento, ehSegmento } from '../lib/settings';
 
 const segParam = Astro.url.searchParams.get('seg');
 if (!ehSegmento(segParam)) {
@@ -9,7 +9,6 @@ if (!ehSegmento(segParam)) {
 const segmento = segParam; // ehSegmento garante o tipo aqui
 
 const settings = await getSettings();
-const seg = SEGMENTOS[segmento];
 const linkGrupo = grupoDoSegmento(settings, segmento);
 const linkAula = settings.link_aula;
 const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
@@ -31,7 +30,7 @@ const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
       </p>
 
       <div class="bloco" style="text-align:left">
-        <p class="rotulo mono">1 · Seu grupo ({seg.emoji} {seg.label})</p>
+        <p class="rotulo mono">1 · Seu grupo no WhatsApp</p>
         {grupoReal ? (
           <a href={linkGrupo} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
             Entrar no grupo no WhatsApp →

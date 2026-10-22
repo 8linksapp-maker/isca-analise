@@ -62,8 +62,8 @@ const jsonLd = {
 
       <!-- STEP 4 · segmento -->
       <div class="step" data-step="4" hidden>
-        <label class="pergunta">Qual é o seu público?</label>
-        <p class="muted small">Escolhe um — é assim que você cai no grupo certo.</p>
+        <label class="pergunta">E o que você faz hoje?</label>
+        <p class="muted small">É só pra eu direcionar o conteúdo certo pra você.</p>
         <div class="radios" role="radiogroup" aria-label="Seu público">
           <label class="radio" for="seg-agencia">
             <input type="radio" id="seg-agencia" name="segmento" value="agencia" />
@@ -276,7 +276,7 @@ const jsonLd = {
     }
     if (passoAtual === 4) {
       if (!document.querySelector('input[name="segmento"]:checked'))
-        return mostrarErro('Escolhe uma opção: Agência, Dono de Negócio ou Freelancer.'), false;
+        return mostrarErro('Marca uma opção pra continuar.'), false;
     }
     limparErro();
     return true;

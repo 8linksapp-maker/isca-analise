@@ -70,7 +70,6 @@ export async function criarLead(input: CadastroInput): Promise<ResultadoCadastro
       assunto: 'Sua análise gratuita está confirmada 🎯',
       html: templateBoasVindasAnalise({
         nome,
-        segmento: segmento as Segmento,
         linkAula: settings.link_aula,
         linkGrupo: grupoDoSegmento(settings, segmento as Segmento),
       }),
