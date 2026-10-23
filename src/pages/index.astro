@@ -1,21 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: 'Análise Gratuita de Site ao Vivo',
-  description:
-    'Inscreva-se para ter seu site analisado ao vivo no Zoom, toda terça às 22h, por Bruno Medeiros. Grátis.',
-  provider: { '@type': 'Person', name: 'Bruno Medeiros' },
-};
 ---
 
 <BaseLayout
   title="Análise Gratuita de Site ao Vivo | Bruno Medeiros"
   description="Cadastre-se e tenha seu site analisado AO VIVO no Zoom, toda terça às 22h. Grátis, com grupos separados por público: agência, dono de negócio e freelancer."
   canonical="https://links.brunomedeiroseo.com.br/analise"
-  jsonLd={jsonLd}
 >
   <div class="container" style="padding-block:48px 64px;max-width:560px">
     <header class="mono" style="color:var(--gray);font-size:13px;margin-bottom:24px">
