@@ -20,9 +20,7 @@ vi.mock('./email', () => ({
 }));
 
 vi.mock('./settings', () => ({
-  getSettings: async () => ({ link_aula: 'https://zoom.us/j/teste', grupo_agencia: 'https://wa/AG', grupo_dono_de_negocio: 'https://wa/DN', grupo_freelancer: 'https://wa/FR' }),
-  grupoDoSegmento: (s: Record<string, string>, seg: string) => s[`grupo_${seg}`] ?? '',
-  ehSegmento: (v: unknown) => ['agencia', 'dono_de_negocio', 'freelancer'].includes(v as string),
+  getSettings: async () => ({ link_aula: 'https://zoom.us/j/teste' }),
 }));
 
 describe('enviarLembreteAula', () => {
@@ -32,7 +30,7 @@ describe('enviarLembreteAula', () => {
     enviarEmailMock.mockResolvedValue(true);
   });
 
-  it('envia para TODOS os leads com link da aula + grupo do segmento', async () => {
+  it('envia para TODOS os leads com o link da aula (sem grupo de WhatsApp)', async () => {
     selectLeads.mockResolvedValue({
       data: [
         { nome: 'Um', email: 'um@t.com', segmento: 'agencia' },
@@ -48,7 +46,7 @@ describe('enviarLembreteAula', () => {
     expect(enviarEmailMock).toHaveBeenCalledTimes(3);
     const p = enviarEmailMock.mock.calls[1][0] as any;
     expect(p.html).toContain('https://zoom.us/j/teste');
-    expect(p.html).toContain('https://wa/FR');
+    expect(p.html).not.toContain('WhatsApp');
   });
 
   it('lista vazia → não envia nada', async () => {

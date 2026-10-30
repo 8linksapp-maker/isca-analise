@@ -2,10 +2,20 @@ import { supabaseServer } from './supabase';
 
 export type Segmento = 'agencia' | 'dono_de_negocio' | 'freelancer';
 
-export const SEGMENTOS: Record<Segmento, { label: string; settingKey: string; emoji: string }> = {
-  agencia: { label: 'Agência', settingKey: 'grupo_agencia', emoji: '🏢' },
-  dono_de_negocio: { label: 'Dono de Negócio', settingKey: 'grupo_dono_de_negocio', emoji: '💼' },
-  freelancer: { label: 'Freelancer', settingKey: 'grupo_freelancer', emoji: '🧑‍💻' },
+export const SEGMENTOS: Record<Segmento, { label: string; emoji: string }> = {
+  agencia: { label: 'Agência', emoji: '🏢' },
+  dono_de_negocio: { label: 'Dono de Negócio', emoji: '💼' },
+  freelancer: { label: 'Freelancer', emoji: '🧑‍💻' },
+};
+
+/** Cookie gravado no cadastro com sucesso — só quem tem ele vê o /obrigado (e a oferta). */
+export const COOKIE_LEAD = 'analise_lead';
+
+/** Oferta exclusiva pós-cadastro (8links). */
+export const OFERTA_8LINKS = {
+  url: 'https://pay.kiwify.com.br/D7o0Q7Y',
+  precoDe: 'R$ 147',
+  precoPor: 'R$ 97',
 };
 
 export function ehSegmento(v: unknown): v is Segmento {
@@ -13,7 +23,7 @@ export function ehSegmento(v: unknown): v is Segmento {
 }
 
 /**
- * Lê as configs editáveis (links de grupo + link da aula).
+ * Lê as configs editáveis (hoje: link_aula = inscrição da aula no Zoom).
  * Retorna objeto { chave: valor } — defaults seguros se faltar linha.
  */
 export async function getSettings(): Promise<Record<string, string>> {
@@ -21,9 +31,6 @@ export async function getSettings(): Promise<Record<string, string>> {
   const { data, error } = await admin.from('analise_settings').select('key, value');
 
   const defaults: Record<string, string> = {
-    grupo_agencia: '',
-    grupo_dono_de_negocio: '',
-    grupo_freelancer: '',
     link_aula: '',
   };
   if (error || !data) {
@@ -32,8 +39,4 @@ export async function getSettings(): Promise<Record<string, string>> {
   }
   for (const row of data) defaults[row.key] = row.value;
   return defaults;
-}
-
-export function grupoDoSegmento(settings: Record<string, string>, segmento: Segmento): string {
-  return settings[SEGMENTOS[segmento].settingKey] ?? '';
 }

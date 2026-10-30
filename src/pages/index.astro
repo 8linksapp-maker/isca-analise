@@ -5,7 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Análise Gratuita de Site ao Vivo | Bruno Medeiros"
-  description="Cadastre-se e tenha seu site analisado AO VIVO no Zoom, toda terça às 22h. Grátis, com grupos separados por público: agência, dono de negócio e freelancer."
+  description="Cadastre-se e tenha seu site analisado AO VIVO no Zoom, toda terça às 22h. Grátis — o link da aula chega no seu email."
   canonical="https://links.brunomedeiroseo.com.br/analise"
 >
   <div class="container" style="padding-block:48px 64px;max-width:560px">
@@ -47,7 +47,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <!-- STEP 3 · whatsapp -->
       <div class="step" data-step="3" hidden>
         <label class="pergunta" for="whatsapp">WhatsApp com DDD?</label>
-        <p class="muted small">Só pra te chamar pro grupo certo no dia da aula.</p>
+        <p class="muted small">Só pra te avisar no dia da aula.</p>
         <input id="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" />
       </div>
 
@@ -79,7 +79,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <button type="button" id="btn-ir" class="btn" style="min-width:180px">Continuar →</button>
       </div>
       <p class="muted small" style="margin-top:16px;text-align:center">
-        Sem spam. Só o link da aula e o seu grupo no WhatsApp.
+        Sem spam. Só o link da aula no seu email.
       </p>
     </div>
   </div>
@@ -204,6 +204,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   let passoAtual = 1;
   let enviando = false;
 
+  // UTMs: lidas da URL de entrada e guardadas na sessão (sobrevivem a reload/redirect)
+  const UTM_CAMPOS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+  const UTM_STORAGE = 'analise_utms';
+
+  function lerUtms(): Record<string, string> {
+    const daUrl: Record<string, string> = {};
+    const params = new URLSearchParams(window.location.search);
+    for (const campo of UTM_CAMPOS) {
+      const v = params.get(campo)?.trim();
+      if (v) daUrl[campo] = v.slice(0, 255);
+    }
+    try {
+      if (Object.keys(daUrl).length) {
+        sessionStorage.setItem(UTM_STORAGE, JSON.stringify(daUrl));
+        return daUrl;
+      }
+      return JSON.parse(sessionStorage.getItem(UTM_STORAGE) || '{}');
+    } catch {
+      return daUrl;
+    }
+  }
+
+  const utms = lerUtms();
+
   const steps = Array.from(document.querySelectorAll<HTMLElement>('.step'));
   const dots = Array.from(document.querySelectorAll<HTMLElement>('.ponto'));
   const labelEl = document.getElementById('passo-label') as HTMLElement;
@@ -278,7 +302,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     enviando = true;
     btnIr.disabled = true;
     btnIr.setAttribute('aria-busy', 'true');
-    btnIr.textContent = 'Separando seu grupo…';
+    btnIr.textContent = 'Confirmando sua vaga…';
 
     const segmentoEl = document.querySelector<HTMLInputElement>('input[name="segmento"]:checked');
 
@@ -291,6 +315,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           email: email.value.trim(),
           whatsapp: whatsapp.value.trim(),
           segmento: segmentoEl?.value,
+          ...utms,
         }),
       });
       const json = (await res.json()) as { ok: boolean; erro?: string };
@@ -304,7 +329,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         return;
       }
 
-      window.location.href = `/obrigado?seg=${encodeURIComponent(segmentoEl?.value ?? '')}`;
+      window.location.href = '/obrigado';
     } catch {
       mostrarErro('Erro de conexão. Tente novamente.');
       btnIr.disabled = false;

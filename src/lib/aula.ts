@@ -1,7 +1,7 @@
 import { supabaseServer } from './supabase';
 import { enviarEmail } from './email';
 import { templateLembreteAula } from './templates';
-import { getSettings, grupoDoSegmento, ehSegmento } from './settings';
+import { getSettings } from './settings';
 
 export interface ResultadoLembrete {
   total: number;
@@ -11,7 +11,7 @@ export interface ResultadoLembrete {
 
 /**
  * Lembrete semanal (terça 21h): envia para TODOS os leads, pra sempre.
- * Lote de 50 em paralelo, um email por lead (com link da aula + grupo do segmento).
+ * Lote de 50 em paralelo, um email por lead (com o link de inscrição da aula no Zoom).
  */
 export async function enviarLembreteAula(): Promise<ResultadoLembrete> {
   const admin = supabaseServer();
@@ -19,7 +19,7 @@ export async function enviarLembreteAula(): Promise<ResultadoLembrete> {
 
   const { data: leads, error } = await admin
     .from('analise_leads')
-    .select('nome, email, segmento')
+    .select('nome, email')
     .order('created_at', { ascending: true });
 
   if (error) throw new Error(`leads: ${error.message}`);
@@ -40,7 +40,6 @@ export async function enviarLembreteAula(): Promise<ResultadoLembrete> {
           html: templateLembreteAula({
             nome: lead.nome,
             linkAula: settings.link_aula,
-            linkGrupo: ehSegmento(lead.segmento) ? grupoDoSegmento(settings, lead.segmento) : '',
           }),
         }),
       ),

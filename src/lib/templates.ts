@@ -82,22 +82,18 @@ function baseHtml(params: {
 </html>`;
 }
 
-/** Email de boas-vindas: link da aula + grupo (sem expor segmentação ao lead). */
+/** Email de boas-vindas: entrega o link de inscrição da aula no Zoom. */
 export function templateBoasVindasAnalise(params: {
   nome: string;
   linkAula: string;
-  linkGrupo: string;
 }): string {
   const primeiroNome = params.nome.trim().split(/\s+/)[0];
   return baseHtml({
     title: 'Bem-vindo — sua Análise Gratuita',
     label: 'Análise gratuita ao vivo',
     heading: `Tudo certo, <span style="color:#e8743b;">${escapeHtml(primeiroNome)}</span> 🎯`,
-    paragrafo: `Sua inscrição para a <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada.<br><br>A aula acontece <strong style="color:#f0f0f0;">toda terça, às 22h</strong>, ao vivo no Zoom. Entra no grupo do WhatsApp que separei pra você pra receber os avisos e marcar sua análise:`,
-    botoes: [
-      { texto: 'Assistir à aula (toda terça, 22h)', url: params.linkAula, destaque: true },
-      { texto: 'Entrar no grupo no WhatsApp', url: params.linkGrupo },
-    ],
+    paragrafo: `Sua inscrição para a <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada.<br><br>A aula acontece <strong style="color:#f0f0f0;">toda terça, às 22h</strong>, ao vivo no Zoom. Aqui está o seu link: clica no botão abaixo e faz a sua inscrição no Zoom — ele te manda o acesso da aula e te lembra antes de começar.<br><br>Guarda este email: o link vale para todas as terças.`,
+    botoes: [{ texto: 'Fazer minha inscrição na aula (Zoom)', url: params.linkAula, destaque: true }],
   });
 }
 
@@ -105,18 +101,14 @@ export function templateBoasVindasAnalise(params: {
 export function templateLembreteAula(params: {
   nome: string;
   linkAula: string;
-  linkGrupo: string;
 }): string {
   const primeiroNome = params.nome.trim().split(/\s+/)[0];
   return baseHtml({
     title: 'Aula hoje às 22h — Análise ao vivo',
     label: 'Hoje tem',
     heading: `É hoje, <span style="color:#e8743b;">${escapeHtml(primeiroNome)}</span> 🔥`,
-    paragrafo: `A <strong style="color:#f0f0f0;">análise gratuita de sites ao vivo</strong> começa <strong style="color:#f0f0f0;">às 22h</strong>, no Zoom. Chega junto e, se quiser ter o teu site analisado, avisa no grupo:`,
-    botoes: [
-      { texto: 'Entrar na aula às 22h', url: params.linkAula, destaque: true },
-      { texto: 'Abrir meu grupo no WhatsApp', url: params.linkGrupo },
-    ],
+    paragrafo: `A <strong style="color:#f0f0f0;">análise gratuita de sites ao vivo</strong> começa <strong style="color:#f0f0f0;">às 22h</strong>, no Zoom. Chega junto e traz o teu site pra ser analisado. Se ainda não se inscreveu no Zoom, é por aqui:`,
+    botoes: [{ texto: 'Acessar a aula das 22h (Zoom)', url: params.linkAula, destaque: true }],
     rodape: 'Você recebe este lembrete porque se cadastrou para a análise gratuita. Toda terça, 21h.',
   });
 }

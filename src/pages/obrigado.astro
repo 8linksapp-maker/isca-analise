@@ -1,22 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getSettings, grupoDoSegmento, ehSegmento } from '../lib/settings';
+import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
 
-const segParam = Astro.url.searchParams.get('seg');
-if (!ehSegmento(segParam)) {
-  return Astro.redirect('/?erro=segmento');
+// Só quem concluiu o cadastro (cookie gravado pelo /api/cadastro) vê esta página e a oferta.
+if (!Astro.cookies.has(COOKIE_LEAD)) {
+  return Astro.redirect('/');
 }
-const segmento = segParam; // ehSegmento garante o tipo aqui
-
-const settings = await getSettings();
-const linkGrupo = grupoDoSegmento(settings, segmento);
-const linkAula = settings.link_aula;
-const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
+Astro.response.headers.set('Cache-Control', 'private, no-store');
 ---
 
 <BaseLayout
   title="Cadastro confirmado — sua análise está a caminho | Bruno Medeiros"
-  description="Você entrou na lista da análise gratuita ao vivo. Confira seu grupo e o link da aula."
+  description="Você entrou na lista da análise gratuita ao vivo. O link da aula foi enviado para o seu email."
   noindex
 >
   <div class="container" style="padding-block:48px 64px;max-width:560px">
@@ -26,34 +21,40 @@ const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
         Tá dentro! <span style="color:var(--orange)">🎯</span>
       </h1>
       <p class="muted" style="font-size:16px">
-        Seu email de boas-vindas já está a caminho com tudo isso aqui:
+        Acabei de enviar <strong style="color:var(--txt)">o link da aula para o seu email</strong>.
       </p>
 
       <div class="bloco" style="text-align:left">
-        <p class="rotulo mono">1 · Seu grupo no WhatsApp</p>
-        {grupoReal ? (
-          <a href={linkGrupo} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
-            Entrar no grupo no WhatsApp →
-          </a>
-        ) : (
-          <p class="muted small" style="margin:0">O link do seu grupo aparece aqui assim que for publicado.</p>
-        )}
-      </div>
-
-      <div class="bloco" style="text-align:left">
-        <p class="rotulo mono">2 · A aula ao vivo</p>
-        <p class="muted small" style="margin:0 0 10px">
-          Toda <strong style="color:var(--txt)">terça, 22h</strong>, no Zoom. Análise de sites reais, ao vivo, grátis.
+        <p class="rotulo mono">Próximo passo · abra seu email</p>
+        <ol class="passos muted small">
+          <li>Procure o email <strong style="color:var(--txt)">“Sua análise gratuita está confirmada”</strong>.</li>
+          <li>Clique no botão e faça sua inscrição no Zoom — é por lá que chega o acesso da aula.</li>
+          <li>A aula é <strong style="color:var(--txt)">toda terça, às 22h</strong>. Traz teu site que eu analiso ao vivo.</li>
+        </ol>
+        <p class="muted small" style="margin:10px 0 0">
+          Não chegou em alguns minutos? Dá uma olhada no spam ou na aba Promoções.
         </p>
-        <a href={linkAula} target="_blank" rel="noopener" class="btn btn-ghost" style="text-decoration:none;display:block">
-          Link da aula (chega por email também) →
-        </a>
       </div>
-
-      <p class="muted small" style="margin-top:24px">
-        Te vejo terça. Traz teu site que eu analiso ao vivo. 👊
-      </p>
     </div>
+
+    <section class="card oferta" aria-labelledby="oferta-titulo">
+      <p class="mono selo">// oferta exclusiva pra quem se cadastrou</p>
+      <h2 id="oferta-titulo">
+        8links: seus backlinks <span style="color:var(--orange)">no automático</span>
+      </h2>
+      <p class="muted" style="font-size:15px;margin:0 0 20px">
+        A 8links é a minha plataforma de criação automática de backlinks. Como você entrou na lista
+        da análise, liberei uma condição que só aparece aqui:
+      </p>
+      <p class="preco">
+        <span class="de">de <s>{OFERTA_8LINKS.precoDe}</s></span>
+        <span class="por">por <strong>{OFERTA_8LINKS.precoPor}</strong></span>
+      </p>
+      <a href={OFERTA_8LINKS.url} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
+        Quero a 8links por {OFERTA_8LINKS.precoPor} →
+      </a>
+      <p class="muted small" style="margin:12px 0 0;text-align:center">Pagamento seguro via Kiwify.</p>
+    </section>
   </div>
 </BaseLayout>
 
@@ -73,10 +74,48 @@ const grupoReal = linkGrupo && !linkGrupo.includes('PLACEHOLDER');
     color: var(--orange);
     margin: 0 0 10px;
   }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+  .passos {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 6px;
+  }
+  .oferta {
+    margin-top: 24px;
+    padding: 32px;
+    border: 1px solid var(--border-hover);
+    background: linear-gradient(180deg, rgba(232, 116, 59, 0.08), transparent 60%), var(--bg2);
+  }
+  .oferta h2 {
+    font-size: clamp(22px, 5vw, 28px);
+    margin: 0 0 12px;
+  }
+  .selo {
+    color: var(--orange);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
+  }
+  .preco {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 20px;
+  }
+  .de {
+    color: var(--gray);
+    font-size: 15px;
+  }
+  .por {
     color: var(--txt);
+    font-size: 18px;
+  }
+  .por strong {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 34px;
+    color: var(--orange);
   }
   .small {
     font-size: 13px;

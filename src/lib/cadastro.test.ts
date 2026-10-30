@@ -15,19 +15,7 @@ vi.mock('./email', () => ({
 }));
 
 vi.mock('./settings', () => ({
-  getSettings: async () => ({
-    link_aula: 'https://zoom.us/j/teste',
-    grupo_agencia: 'https://chat.whatsapp.com/AG',
-    grupo_dono_de_negocio: 'https://chat.whatsapp.com/DN',
-    grupo_freelancer: 'https://chat.whatsapp.com/FR',
-  }),
-  grupoDoSegmento: (s: Record<string, string>, seg: string) => s[`grupo_${seg}`] ?? '',
-  SEGMENTOS: {
-    agencia: { label: 'Agência', settingKey: 'grupo_agencia', emoji: '🏢' },
-    dono_de_negocio: { label: 'Dono', settingKey: 'grupo_dono_de_negocio', emoji: '💼' },
-    freelancer: { label: 'Freela', settingKey: 'grupo_freelancer', emoji: '🧑‍💻' },
-  },
-  ehSegmento: (v: unknown) => typeof v === 'string' && v.startsWith('grupo') === false,
+  getSettings: async () => ({ link_aula: 'https://zoom.us/meeting/register/teste' }),
 }));
 
 const valido = {
@@ -91,15 +79,41 @@ describe('criarLead', () => {
     expect(opts).toEqual({ onConflict: 'email' });
   });
 
-  it('envia boas-vindas com link da aula e do grupo CERTO do segmento', async () => {
+  it('envia boas-vindas com o link de inscrição da aula e sem grupo de WhatsApp', async () => {
     const data = cadastroSchema.parse({ ...valido, segmento: 'freelancer' });
     await criarLead(data);
 
     expect(enviarEmailMock).toHaveBeenCalledTimes(1);
     const p = enviarEmailMock.mock.calls[0][0] as any;
-    expect(p.html).toContain('https://zoom.us/j/teste');
-    expect(p.html).toContain('https://chat.whatsapp.com/FR');
-    expect(p.html).not.toContain('https://chat.whatsapp.com/AG');
+    expect(p.html).toContain('https://zoom.us/meeting/register/teste');
+    expect(p.html).not.toContain('WhatsApp');
+  });
+
+  it('grava as UTMs que vieram no cadastro', async () => {
+    const data = cadastroSchema.parse({
+      ...valido,
+      utm_source: 'instagram',
+      utm_medium: 'stories',
+      utm_campaign: 'analise-out26',
+    });
+    await criarLead(data);
+
+    const [payload] = upsert.mock.calls[0];
+    expect(payload).toMatchObject({
+      utm_source: 'instagram',
+      utm_medium: 'stories',
+      utm_campaign: 'analise-out26',
+    });
+  });
+
+  it('UTM ausente ou vazia não entra no upsert (re-cadastro não apaga a origem)', async () => {
+    const data = cadastroSchema.parse({ ...valido, utm_source: '  ', utm_medium: '' });
+    await criarLead(data);
+
+    const [payload] = upsert.mock.calls[0] as [Record<string, unknown>];
+    for (const campo of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']) {
+      expect(payload).not.toHaveProperty(campo);
+    }
   });
 
   it('falha do Brevo não derruba o cadastro', async () => {

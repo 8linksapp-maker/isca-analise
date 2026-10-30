@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { supabaseServer } from './supabase';
 import { enviarEmail } from './email';
 import { templateBoasVindasAnalise } from './templates';
-import { getSettings, grupoDoSegmento, type Segmento } from './settings';
+import { getSettings } from './settings';
 
 /**
  * WhatsApp BR: aceita qualquer DDD (nada de prender em 11).
@@ -20,6 +20,16 @@ export const whatsappSchema = z
     message: 'WhatsApp inválido — informe DDD + número (10 ou 11 dígitos).',
   });
 
+/** UTMs de origem do lead — opcionais; vazio vira undefined (não sobrescreve no upsert). */
+export const UTM_CAMPOS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const;
+
+const utmSchema = z
+  .string()
+  .trim()
+  .max(255)
+  .optional()
+  .transform((v) => v || undefined);
+
 export const cadastroSchema = z.object({
   nome: z.string().trim().min(1, 'Nome obrigatório').max(120),
   email: z.string().trim().toLowerCase().email('Email inválido').max(254),
@@ -27,6 +37,11 @@ export const cadastroSchema = z.object({
   segmento: z.enum(['agencia', 'dono_de_negocio', 'freelancer'], {
     errorMap: () => ({ message: 'Escolha uma opção: Agência, Dono de Negócio ou Freelancer.' }),
   }),
+  utm_source: utmSchema,
+  utm_medium: utmSchema,
+  utm_campaign: utmSchema,
+  utm_term: utmSchema,
+  utm_content: utmSchema,
 });
 
 export type CadastroInput = z.infer<typeof cadastroSchema>;
@@ -37,11 +52,18 @@ export type ResultadoCadastro =
 
 /**
  * Grava o lead (re-cadastro substitui o cadastro antigo) e envia o
- * email de boas-vindas com o link da aula + grupo do segmento.
+ * email de boas-vindas com o link de inscrição da aula no Zoom.
+ * UTMs só entram no payload quando vieram preenchidas — re-cadastro
+ * sem UTM não apaga a origem gravada antes.
  */
 export async function criarLead(input: CadastroInput): Promise<ResultadoCadastro> {
   const { nome, email, whatsapp, segmento } = input;
   const admin = supabaseServer();
+
+  const utms: Partial<Record<(typeof UTM_CAMPOS)[number], string>> = {};
+  for (const campo of UTM_CAMPOS) {
+    if (input[campo]) utms[campo] = input[campo];
+  }
 
   const { error } = await admin
     .from('analise_leads')
@@ -51,6 +73,7 @@ export async function criarLead(input: CadastroInput): Promise<ResultadoCadastro
         email,
         whatsapp,
         segmento,
+        ...utms,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'email' },
@@ -71,7 +94,6 @@ export async function criarLead(input: CadastroInput): Promise<ResultadoCadastro
       html: templateBoasVindasAnalise({
         nome,
         linkAula: settings.link_aula,
-        linkGrupo: grupoDoSegmento(settings, segmento as Segmento),
       }),
     });
   } catch (err) {
