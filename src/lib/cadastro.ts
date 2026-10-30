@@ -81,7 +81,7 @@ export async function criarLead(input: CadastroInput): Promise<ResultadoCadastro
 
   if (error) {
     console.error('[cadastro] upsert:', error.message);
-    return { ok: false, status: 500, erro: 'Não foi possível concluir o cadastro. Tente novamente.' };
+    return { ok: false, status: 500, erro: 'Não foi possível concluir o cadastro. Tente novamente. [db: ' + error.message + ']' };
   }
 
   // boas-vindas best-effort — falha de email não derruba o cadastro
