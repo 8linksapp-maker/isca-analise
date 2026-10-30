@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (resultado.ok) {
       cookies.set(COOKIE_LEAD, '1', {
         path: '/',
-        httpOnly: true,
+        httpOnly: false, // lido no navegador: /obrigado é estática
         secure: true,
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30,

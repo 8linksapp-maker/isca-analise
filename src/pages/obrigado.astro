@@ -1,12 +1,8 @@
 ---
+// Estática: página SSR em produção no CF Pages sai como "[object Object]" (mesmo bug da index).
+export const prerender = true;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
-
-// Só quem concluiu o cadastro (cookie gravado pelo /api/cadastro) vê esta página e a oferta.
-if (!Astro.cookies.has(COOKIE_LEAD)) {
-  return Astro.redirect('/');
-}
-Astro.response.headers.set('Cache-Control', 'private, no-store');
 ---
 
 <BaseLayout
@@ -14,7 +10,7 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
   description="Você entrou na lista da análise gratuita ao vivo. O link da aula foi enviado para o seu email."
   noindex
 >
-  <div class="container" style="padding-block:48px 64px;max-width:560px">
+  <div id="obrigado" class="container" style="padding-block:48px 64px;max-width:560px" hidden>
     <div class="card" style="padding:40px 32px;text-align:center">
       <p class="mono" style="color:var(--orange);font-size:13px;margin:0 0 8px">// confirmado</p>
       <h1 style="font-size:clamp(26px,6vw,38px)">
@@ -56,6 +52,14 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
       <p class="muted small" style="margin:12px 0 0;text-align:center">Pagamento seguro via Kiwify.</p>
     </section>
   </div>
+  <script is:inline define:vars={{ cookieLead: COOKIE_LEAD }}>
+    // Só quem concluiu o cadastro (cookie gravado pelo /api/cadastro) vê a página e a oferta.
+    if (document.cookie.split('; ').some((c) => c.startsWith(cookieLead + '='))) {
+      document.getElementById('obrigado').hidden = false;
+    } else {
+      window.location.replace('/');
+    }
+  </script>
 </BaseLayout>
 
 <style>
