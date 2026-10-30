@@ -24,8 +24,8 @@ import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
         <p class="rotulo mono">Próximo passo · abra seu email</p>
         <ol class="passos muted small">
           <li>Procure o email <strong style="color:var(--txt)">“Sua análise gratuita está confirmada”</strong>.</li>
-          <li>Clique no botão e faça sua inscrição no Zoom — é por lá que chega o acesso da aula.</li>
-          <li>A aula é <strong style="color:var(--txt)">toda terça, às 22h</strong>. Traz teu site que eu analiso ao vivo.</li>
+          <li>Guarde o <strong style="color:var(--txt)">link da aula</strong> que está nele — é o mesmo toda semana.</li>
+          <li>A aula é <strong style="color:var(--txt)">toda terça, às 22h</strong>, e você recebe um lembrete por email. Traz teu site que eu analiso ao vivo.</li>
         </ol>
         <p class="muted small" style="margin:10px 0 0">
           Não chegou em alguns minutos? Dá uma olhada no spam ou na aba Promoções.
@@ -46,7 +46,7 @@ import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
         <span class="de">de <s>{OFERTA_8LINKS.precoDe}</s></span>
         <span class="por">por <strong>{OFERTA_8LINKS.precoPor}</strong></span>
       </p>
-      <a href={OFERTA_8LINKS.url} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
+      <a id="link-oferta" href={OFERTA_8LINKS.url} target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:block">
         Quero a 8links por {OFERTA_8LINKS.precoPor} →
       </a>
       <p class="muted small" style="margin:12px 0 0;text-align:center">Pagamento seguro via Kiwify.</p>
@@ -56,6 +56,17 @@ import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
     // Só quem concluiu o cadastro (cookie gravado pelo /api/cadastro) vê a página e a oferta.
     if (document.cookie.split('; ').some((c) => c.startsWith(cookieLead + '='))) {
       document.getElementById('obrigado').hidden = false;
+      // utm_content do checkout = origem do lead na landing (ex.: youtube|tutorial_8links|tut-01)
+      try {
+        var u = JSON.parse(sessionStorage.getItem('analise_utms') || '{}');
+        var origem = [u.utm_source, u.utm_campaign, u.utm_content].filter(Boolean).join('|');
+        if (origem) {
+          var a = document.getElementById('link-oferta');
+          var url = new URL(a.href);
+          url.searchParams.set('utm_content', origem.slice(0, 255));
+          a.href = url.toString();
+        }
+      } catch (e) {}
     } else {
       window.location.replace('/');
     }

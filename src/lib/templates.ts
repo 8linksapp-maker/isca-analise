@@ -16,6 +16,8 @@ function baseHtml(params: {
   label: string;
   heading: string;
   paragrafo: string;
+  /** HTML extra logo após o parágrafo (ex.: card com o link da aula). */
+  extra?: string;
   botoes: Array<{ texto: string; url: string; destaque?: boolean }>;
   rodape?: string;
 }): string {
@@ -61,7 +63,7 @@ function baseHtml(params: {
               </h1>
               <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#a0a0a0;">
                 ${params.paragrafo}
-              </p>${blocosBotoes}
+              </p>${params.extra ?? ''}${blocosBotoes}
             </td>
           </tr>
           <tr>
@@ -82,7 +84,27 @@ function baseHtml(params: {
 </html>`;
 }
 
-/** Email de boas-vindas: entrega o link de inscrição da aula no Zoom. */
+/** Card "guarde este link" — o link da aula em destaque, sem botão. */
+function cardLinkAula(linkAula: string): string {
+  if (!linkAula) return '';
+  const link = escapeHtml(linkAula);
+  return `
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+                <tr>
+                  <td style="background-color:#1e1e1e;border:1px dashed rgba(232,116,59,0.55);border-radius:12px;padding:20px 22px;">
+                    <p style="margin:0 0 10px;font-family:'JetBrains Mono',Consolas,monospace;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#e8743b;">📌 Seu link da aula — guarde</p>
+                    <p style="margin:0 0 14px;font-family:'JetBrains Mono',Consolas,monospace;font-size:14px;line-height:1.5;word-break:break-all;">
+                      <a href="${link}" target="_blank" style="color:#f0f0f0;text-decoration:underline;text-decoration-color:rgba(232,116,59,0.6);">${link}</a>
+                    </p>
+                    <p style="margin:0;font-size:13px;line-height:1.6;color:#a0a0a0;">
+                      🗓️ Toda <strong style="color:#f0f0f0;">terça, às 22h</strong> (Brasília) &nbsp;·&nbsp; 🎥 Zoom &nbsp;·&nbsp; 🔁 o mesmo link toda semana
+                    </p>
+                  </td>
+                </tr>
+              </table>`;
+}
+
+/** Email de boas-vindas: entrega o link da aula pra guardar + avisa dos lembretes de terça. */
 export function templateBoasVindasAnalise(params: {
   nome: string;
   linkAula: string;
@@ -92,8 +114,15 @@ export function templateBoasVindasAnalise(params: {
     title: 'Bem-vindo — sua Análise Gratuita',
     label: 'Análise gratuita ao vivo',
     heading: `Tudo certo, <span style="color:#e8743b;">${escapeHtml(primeiroNome)}</span> 🎯`,
-    paragrafo: `Sua inscrição para a <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada.<br><br>A aula acontece <strong style="color:#f0f0f0;">toda terça, às 22h</strong>, ao vivo no Zoom. Aqui está o seu link: clica no botão abaixo e faz a sua inscrição no Zoom — ele te manda o acesso da aula e te lembra antes de começar.<br><br>Guarda este email: o link vale para todas as terças.`,
-    botoes: [{ texto: 'Fazer minha inscrição na aula (Zoom)', url: params.linkAula, destaque: true }],
+    paragrafo: `Sua vaga na <strong style="color:#f0f0f0;">análise gratuita de site ao vivo</strong> está confirmada.<br><br>Abaixo está o <strong style="color:#f0f0f0;">link da aula</strong>. Guarda ele com carinho — é por ele que você entra, toda semana:`,
+    extra: `${cardLinkAula(params.linkAula)}
+              <p style="margin:0 0 12px;font-size:16px;line-height:1.6;color:#a0a0a0;">
+                <strong style="color:#f0f0f0;">Toda terça você vai receber um lembrete aqui no email</strong> antes da aula começar, então não tem como esquecer.
+              </p>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#a0a0a0;">
+                💡 Dica: marca este email com estrela ou salva o link nos favoritos. E traz teu site — eu analiso ao vivo.
+              </p>`,
+    botoes: [],
   });
 }
 
@@ -107,7 +136,7 @@ export function templateLembreteAula(params: {
     title: 'Aula hoje às 22h — Análise ao vivo',
     label: 'Hoje tem',
     heading: `É hoje, <span style="color:#e8743b;">${escapeHtml(primeiroNome)}</span> 🔥`,
-    paragrafo: `A <strong style="color:#f0f0f0;">análise gratuita de sites ao vivo</strong> começa <strong style="color:#f0f0f0;">às 22h</strong>, no Zoom. Chega junto e traz o teu site pra ser analisado. Se ainda não se inscreveu no Zoom, é por aqui:`,
+    paragrafo: `A <strong style="color:#f0f0f0;">análise gratuita de sites ao vivo</strong> começa <strong style="color:#f0f0f0;">às 22h</strong>, no Zoom. Chega junto e traz o teu site pra ser analisado. O link é o mesmo de sempre:`,
     botoes: [{ texto: 'Acessar a aula das 22h (Zoom)', url: params.linkAula, destaque: true }],
     rodape: 'Você recebe este lembrete porque se cadastrou para a análise gratuita. Toda terça, 21h.',
   });

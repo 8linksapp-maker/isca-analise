@@ -13,7 +13,8 @@ export const COOKIE_LEAD = 'analise_lead';
 
 /** Oferta exclusiva pós-cadastro (8links). */
 export const OFERTA_8LINKS = {
-  url: 'https://pay.kiwify.com.br/D7o0Q7Y',
+  // UTMs fixas identificam a origem da venda; o /obrigado acrescenta utm_content com a origem do lead.
+  url: 'https://pay.kiwify.com.br/D7o0Q7Y?utm_source=isca-analise&utm_medium=pagina-obrigado&utm_campaign=oferta-8links-97',
   precoDe: 'R$ 147',
   precoPor: 'R$ 97',
 };
