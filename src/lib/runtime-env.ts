@@ -16,10 +16,10 @@ export function setRuntimeEnv(env: Record<string, unknown> | undefined): void {
 
 export function getVar(name: string): string {
   const rt = _runtimeEnv[name];
-  if (typeof rt === 'string' && rt) return rt;
+  if (typeof rt === 'string' && rt.trim()) return rt.trim();
 
   const build = (import.meta.env as Record<string, string | undefined>)[name];
-  if (build) return build;
+  if (build?.trim()) return build.trim();
 
   const g = (globalThis as Record<string, unknown>)[name];
   return typeof g === 'string' ? g : '';
