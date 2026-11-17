@@ -58,7 +58,7 @@ import { COOKIE_LEAD, OFERTA_8LINKS } from '../lib/settings';
       document.getElementById('obrigado').hidden = false;
       // utm_content do checkout = origem do lead na landing (ex.: youtube|tutorial_8links|tut-01)
       try {
-        var u = JSON.parse(sessionStorage.getItem('analise_utms') || '{}');
+        var u = JSON.parse(sessionStorage.getItem('isca_utms') || '{}');
         var origem = [u.utm_source, u.utm_campaign, u.utm_content].filter(Boolean).join('|');
         if (origem) {
           var a = document.getElementById('link-oferta');

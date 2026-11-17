@@ -194,6 +194,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </style>
 
 <script>
+  import { lerUtms, registrarVisita } from '../lib/utm-client';
+
   const LABELS: Record<number, string> = {
     1: 'Passo 01 — seu nome',
     2: 'Passo 02 — seu email',
@@ -204,28 +206,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   let passoAtual = 1;
   let enviando = false;
 
-  // UTMs: lidas da URL de entrada e guardadas na sessão (sobrevivem a reload/redirect)
-  const UTM_CAMPOS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-  const UTM_STORAGE = 'analise_utms';
-
-  function lerUtms(): Record<string, string> {
-    const daUrl: Record<string, string> = {};
-    const params = new URLSearchParams(window.location.search);
-    for (const campo of UTM_CAMPOS) {
-      const v = params.get(campo)?.trim();
-      if (v) daUrl[campo] = v.slice(0, 255);
-    }
-    try {
-      if (Object.keys(daUrl).length) {
-        sessionStorage.setItem(UTM_STORAGE, JSON.stringify(daUrl));
-        return daUrl;
-      }
-      return JSON.parse(sessionStorage.getItem(UTM_STORAGE) || '{}');
-    } catch {
-      return daUrl;
-    }
-  }
-
+  registrarVisita();
   const utms = lerUtms();
 
   const steps = Array.from(document.querySelectorAll<HTMLElement>('.step'));
