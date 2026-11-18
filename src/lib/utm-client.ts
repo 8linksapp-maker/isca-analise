@@ -29,21 +29,36 @@ export function lerUtms(): Record<string, string> {
   }
 }
 
-/** Conta o clique no link com UTM (1x por sessão por combinação de UTMs). */
+/**
+ * Conta o clique no link com UTM (1x por sessão por combinação de UTMs),
+ * só depois de um sinal humano: rolar, tocar, clicar, mexer o mouse ou teclar.
+ * Verificadores de link (YouTube/Google) abrem a página e rodam o JS, mas não interagem.
+ */
 export function registrarVisita(): void {
   const daUrl = utmsDaUrl();
-  if (!Object.keys(daUrl).length) return;
+  if (!Object.keys(daUrl).length || navigator.webdriver) return;
   const chave = `isca_visita:${JSON.stringify(daUrl)}`;
   try {
     if (sessionStorage.getItem(chave)) return;
-    sessionStorage.setItem(chave, '1');
   } catch {
     // sem sessionStorage: conta mesmo assim
   }
-  fetch('/api/visita', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(daUrl),
-    keepalive: true,
-  }).catch(() => {});
+
+  const eventos = ['scroll', 'pointerdown', 'pointermove', 'touchstart', 'keydown', 'wheel'];
+  const enviar = () => {
+    eventos.forEach((e) => window.removeEventListener(e, enviar));
+    try {
+      if (sessionStorage.getItem(chave)) return;
+      sessionStorage.setItem(chave, '1');
+    } catch {
+      // segue
+    }
+    fetch('/api/visita', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(daUrl),
+      keepalive: true,
+    }).catch(() => {});
+  };
+  eventos.forEach((e) => window.addEventListener(e, enviar, { passive: true }));
 }

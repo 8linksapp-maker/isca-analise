@@ -45,11 +45,29 @@ function temUtm(utms: Utms): boolean {
   return Object.keys(utms).length > 0;
 }
 
-/** Clique: alguém abriu a isca por um link com UTM. */
-export async function registrarVisita(utms: Utms): Promise<void> {
+/**
+ * Robô pelo User-Agent: verificadores de link do YouTube/Google, crawlers,
+ * previews de rede social, navegadores automatizados e clientes HTTP.
+ * UA vazio também conta como robô.
+ */
+const ROBO_UA =
+  /bot|crawl|spider|slurp|headless|lighthouse|preview|inspection|googleother|google-|facebookexternalhit|whatsapp|telegram|discord|python|curl|wget|axios|node-fetch|undici|go-http|okhttp|java\/|httpclient|phantom|selenium|puppeteer|playwright/i;
+
+export function ehRobo(userAgent: string | null | undefined): boolean {
+  return !userAgent || ROBO_UA.test(userAgent);
+}
+
+/** Clique: alguém abriu a isca por um link com UTM (userAgent fica salvo p/ auditoria). */
+export async function registrarVisita(utms: Utms, userAgent?: string | null): Promise<void> {
   if (!temUtm(utms)) return;
   try {
-    const { error } = await supabaseServer().from('isca_visitas').insert({ isca: ISCA, ...utms });
+    const db = supabaseServer();
+    const linha = { isca: ISCA, ...utms, ...(userAgent ? { user_agent: userAgent.slice(0, 500) } : {}) };
+    let { error } = await db.from('isca_visitas').insert(linha);
+    // coluna user_agent ainda não criada (migration pendente): grava sem ela
+    if (error && 'user_agent' in linha && /user_agent/.test(error.message)) {
+      ({ error } = await db.from('isca_visitas').insert({ isca: ISCA, ...utms }));
+    }
     if (error) console.error('[utm] visita:', error.message);
   } catch (err) {
     console.error('[utm] visita:', err instanceof Error ? err.message : err);
